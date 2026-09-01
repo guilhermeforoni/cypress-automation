@@ -1,8 +1,10 @@
 describe('SauceDemo Login', () => {
 
-  it('Test-1 - should login successfully with valid credentials', () => {
-
+    beforeEach(() => {
     cy.visit('https://www.saucedemo.com/')
+  })
+
+  it('Test-1 - should login successfully with valid credentials', () => {
 
     cy.get('#user-name')
       .type('standard_user')
@@ -21,8 +23,6 @@ describe('SauceDemo Login', () => {
   })
 
   it(`Test-2 - should display an error with invalid password`, () => {
-
-    cy.visit('https://www.saucedemo.com/')
 
     cy.get('#user-name')
       .type('standard_user')
