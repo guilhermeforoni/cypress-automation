@@ -53,7 +53,7 @@ describe('SauceDemo - Fluxo de Checkout e Compra', () => {
 
   })
 
-  it('Deve exibir mensagem de erro ao tentar avançar no checkout sem preencher os campos', function () {
+  it('Teste 2 - Deve exibir mensagem de erro ao tentar avançar no checkout sem preencher os campos', function () {
     // Adiciona o produto e vai até a etapa 1 do checkout
     cy.get('[data-test="add-to-cart-sauce-labs-backpack"]').click()
     cy.get('[data-test="shopping-cart-link"]').click()
