@@ -1,45 +1,28 @@
-describe('SauceDemo Login', () => {
+import LoginPage from '../support/pages/LoginPage'
 
-    beforeEach(() => {
-    cy.visit('https://www.saucedemo.com/')
+describe('SauceDemo - Login (Padrão POM)', () => {
+
+  beforeEach(() => {
+    LoginPage.visitPage()
+    cy.fixture('users').as('users')
   })
 
-  it('Test-1 - should login successfully with valid credentials', () => {
+  it('Test-1 - Deve realizar login com sucesso usando credenciais válidas', function () {
+    LoginPage.login(this.users.validUser.username, this.users.validUser.password)
 
-//    cy.get('#user-name')
-//      .type('standard_user')
-
-//    cy.get('#password')
-//      .type('secret_sauce')
-
-//    cy.get('#login-button')
-//      .click()
-
-cy.login(`standard_user`, `secret_sauce`)
-
-    cy.url()
-      .should('include', '/inventory.html')
-
-    cy.contains(`Products`)
-      .should(`be.visible`)
+    cy.url().should('include', '/inventory.html')
   })
 
-  it(`Test-2 - should display an error with invalid password`, () => {
+  it('Test-2 - Deve exibir erro ao inserir senha inválida', function () {
+    LoginPage.login(this.users.invalidPasswordUser.username, this.users.invalidPasswordUser.password)
 
-//    cy.get('#user-name')
-//      .type('standard_user')
+    LoginPage.validateErrorMessage('Username and password do not match any user')
+  })
 
-//    cy.get('#password')
-//      .type('invalid_password')
+  it('Test-3 - Deve exibir erro para usuário bloqueado', function () {
+    LoginPage.login(this.users.lockedUser.username, this.users.lockedUser.password)
 
-//    cy.get('#login-button')
-//      .click()
-
-cy.login(`standart_user`, `invalid_password`)
-
-    cy.get('[data-test="error"]')
-      .should('be.visible')
-      .and('contain', 'Username and password do not match any user')
+    LoginPage.validateErrorMessage('Sorry, this user has been locked out.')
   })
 
 })

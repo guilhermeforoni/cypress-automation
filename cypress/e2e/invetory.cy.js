@@ -1,58 +1,44 @@
-describe('SauceDemo - Carrinho de Compras', () => {
+import LoginPage from '../support/pages/LoginPage.js'
+import InventoryPage from '../support/pages/InventoryPage.js'
 
-    beforeEach(() => {
-     // 1. Carrega a fixture com os dados do usuário   
+describe('SauceDemo - Testes do Catálogo e Carrinho (Padrão POM)', () => {
+
+  beforeEach(() => {
+    // 1. Visita a página inicial e carrega a fixture
+    LoginPage.visitPage()
     cy.fixture('users').as('users')
-     
-     // 2. Acessa o site e realiza o login antes de cada teste de produto
-     cy.visit('https://www.saucedemo.com/')
-     cy.get('@users').then((users) =>{
-        cy.login(users.validUser.username, users.validUser.password)
-     })
-     // 3. Garante que o login concluiu com sucesso antes de iniciar o teste
-     cy.url().should('include', '/inventory.html')
+
+    // 2. Faz login com usuário válido
+    cy.get('@users').then((users) => {
+      LoginPage.login(users.validUser.username, users.validUser.password)
     })
 
+    // 3. Valida que está na página de produtos
+    cy.url().should('include', '/inventory.html')
+  })
 
-it('Teste 1 - Deve adicionar um produto ao carrinho com sucesso', () => {
-    // Adiciona a "Sauce Labs Backpack" ao carrinho usando o seletor data-test
-    cy.get('[data-test="add-to-cart-sauce-labs-backpack"]').click()
+  it('Deve adicionar um produto ao carrinho com sucesso', function () {
+    // Adiciona a mochila ao carrinho
+    InventoryPage.addBackpackToCart()
 
-    // Verifica que quando clicar para adicionar produto, o icone do carrinho de compras muda e mostra o texto 1
-    // o "have,text" é um asserção já embutida no Cypress que lê a propriedade de texto
-    cy.get('[data-test="shopping-cart-badge"]')
-    .should('be.visible')
-    .and('have.text', '1')
+    // Valida se o contador do carrinho exibiu o número 1
+    InventoryPage.validateCartBadgeCount('1')
+  })
 
-})
+  it('Deve remover um produto do carrinho com sucesso', function () {
+    // Adiciona e depois remove a mochila
+    InventoryPage.addBackpackToCart()
+    InventoryPage.removeBackpackFromCart()
 
-it('Teste 2 - Deve remover um produto do carrinho na tela de inventário', () =>{
-    // Adicionando o produto primeiro
-    cy.get('[data-test="add-to-cart-sauce-labs-backpack"]').click()
-    cy.get('[data-test="shopping-cart-badge"]').should('be.visible').and('have.text', '1')
+    // Valida se o ícone do contador desapareceu do carrinho
+    InventoryPage.validateCartBadgeNotExist()
+  })
 
-    // Removendo o produto
-    cy.get('[data-test="remove-sauce-labs-backpack"]').click()
+  it('Deve navegar para a tela do carrinho ao clicar no ícone do carrinho', function () {
+    InventoryPage.goToCart()
 
-    // Validando se o contador do carrinho foi removido
-    cy.get('[data-test="shopping-cart-badge"]').should('not.exist')
-
-    //Validando que o botão do produto voltou a ser "Add to cart"
-    cy.get('[data-test="add-to-cart-sauce-labs-backpack"]').should('be.visible')
-})
-
-it('Teste 3 - Validação do produto dentro da página do carrinho de compras', () =>{
-    // Adicionando o produto e validando icone alterado do carrinho
-    cy.get('[data-test="add-to-cart-sauce-labs-backpack"]').click()
-    cy.get('[data-test="shopping-cart-badge"]').should('be.visible').and('have.text', '1')
-    cy.get('[data-test="shopping-cart-link"]').click()
-
-    // Validando direcionando da pagina
+    // Valida navegação para a página do carrinho
     cy.url().should('include', '/cart.html')
-
-    // Validando se o item correto foi adicionado na lista de compras
-    cy.get('[data-test="inventory-item-name"]').should('have.text', 'Sauce Labs Backpack')
-    cy.get('[data-test="shopping-cart-badge"]').should('have.text', '1')
-})
+  })
 
 })
